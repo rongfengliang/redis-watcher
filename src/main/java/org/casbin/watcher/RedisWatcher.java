@@ -5,12 +5,14 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class RedisWatcher implements Watcher {
     private Runnable updateCallback;
     private final JedisPool jedisPool;
     private final String localId;
+    private  ChannelRunnable channelRunnable;
     private final String redisChannelName;
     private SubThread subThread;
 
@@ -18,6 +20,23 @@ public class RedisWatcher implements Watcher {
         this.jedisPool = new JedisPool(new JedisPoolConfig(), redisIp, redisPort);
         this.localId = UUID.randomUUID().toString();
         this.redisChannelName=redisChannelName;
+        startSub();
+    }
+
+    // can pass jedispool
+    public RedisWatcher(JedisPool jedisPool,String redisChannelName){
+        this.jedisPool = jedisPool;
+        this.localId = UUID.randomUUID().toString();
+        this.redisChannelName=redisChannelName;
+        startSub();
+    }
+
+    // can pass jedispool
+    public RedisWatcher(JedisPool jedisPool,String redisChannelName,ChannelRunnable channelRunnable){
+        this.jedisPool = jedisPool;
+        this.localId = UUID.randomUUID().toString();
+        this.redisChannelName=redisChannelName;
+        this.channelRunnable=channelRunnable;
         startSub();
     }
 
@@ -37,7 +56,11 @@ public class RedisWatcher implements Watcher {
     }
 
     private void startSub(){
-        subThread = new SubThread(jedisPool,redisChannelName,updateCallback);
+        if(Objects.nonNull(this.channelRunnable)) {
+            subThread = new SubThread(jedisPool,redisChannelName,updateCallback,channelRunnable);
+        }else{
+            subThread = new SubThread(jedisPool,redisChannelName,updateCallback);
+        }
         subThread.start();
     }
 }
