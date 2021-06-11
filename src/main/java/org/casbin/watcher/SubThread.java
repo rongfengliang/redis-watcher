@@ -27,7 +27,6 @@ public class SubThread extends Thread{
     /**
      * add patch for subsribe with chananel name
      * @param runnable
-     * @param channelRunnable
      */
     public void setUpdateCallback(Runnable runnable){
         subscriber.setUpdateCallback(runnable);
