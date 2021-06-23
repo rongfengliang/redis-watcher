@@ -27,11 +27,10 @@ public static void main(String[] args) {
     enforcer.setWatcher(redisWatcher);
 
     // Set callback to local example
-    Runnable updateCallback = ()->{
-        //do something
-    };
-    redisWatcher.setUpdateCallback(updateCallback);
-
+        Consumer<String> consumer = (s)-> {
+        System.out.println(s);
+        };
+        redisWatcher.setUpdateCallback(consumer);
     // Update the policy to test the effect.
     enforcer.savePolicy();
 }

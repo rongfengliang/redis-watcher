@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.function.Consumer;
 
 public class RedisWatcherTest {
     private RedisWatcher redisWatcher;
@@ -25,6 +26,10 @@ public class RedisWatcherTest {
     public void testUpdate() throws InterruptedException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         System.setOut(new PrintStream(baos));
+        Consumer<String> consumer = (s)-> {
+            System.out.println(s);
+        };
+        redisWatcher.setUpdateCallback(consumer);
         redisWatcher.setUpdateCallback(()-> System.out.print(expect) );
         redisWatcher.update();
         Thread.sleep(100);
